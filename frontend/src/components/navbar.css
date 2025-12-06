@@ -1,0 +1,33 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #272927;
+  padding: 1rem 2rem;
+  color: white;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  color: #EE0000; /* Ferrari red :) */
+}
+.logo-img {
+  height: 75px; /* adjust as needed */
+  width: auto;
+}

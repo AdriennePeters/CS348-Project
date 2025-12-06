@@ -1,0 +1,180 @@
+
+/* Container for the page */
+.Drivers {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Page header */
+  .header h1 {
+    text-align: center;
+    color: #272927;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Status messages (loading/error) */
+  .status-text {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #272927;
+  }
+  
+  .status-text.error {
+    color: red;
+  }
+  
+  /* Table container with horizontal scroll for small screens */
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  /* F1 table styling */
+  .f1-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+  
+  /* Table header */
+  .f1-table thead tr {
+    background-color: #272927; /* dark header */
+    color: white;
+  }
+  
+  .f1-table th,
+  .f1-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+  }
+  
+  /* Alternating row colors */
+  .f1-table tbody tr:nth-child(even) {
+    background-color: #f4f4f4;
+  }
+  
+  .f1-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+  }
+  
+  /* Driver name bold for last name */
+  .driver-name strong {
+    font-weight: bold;
+  }
+  
+  /* Responsive font */
+  @media (max-width: 768px) {
+    .f1-table th,
+    .f1-table td {
+      padding: 8px 10px;
+    }
+  }
+
+  .edit-driver-icon {
+    background: none;      /* remove background */
+    border: none;          /* remove border */
+    padding: 0;   
+    cursor: pointer;
+    color: #272927;;
+    font-size: 1.2rem;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+  }
+  .edit-driver-icon:hover {
+    color: #EE0000;
+  }
+
+  .delete-driver-icon {
+    background: none;      /* remove background */
+    border: none;          /* remove border */
+    padding: 0;   
+    cursor: pointer;
+    color: #272927;
+    font-size: 1.2rem;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+  }
+  .delete-driver-icon:hover {
+    color: #EE0000;
+  }
+
+  .add-driver-icon {
+    background: none;      /* remove background */
+    border: none;          /* remove border */
+    padding: 0;   
+    cursor: pointer;
+    color: #272927;
+    font-size: 1.2rem;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+  }
+  .add-driver-icon:hover {
+    color: #EE0000;
+  }
+  .circle {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-right: 8px; /* small spacing between text and circle */
+    vertical-align: middle;
+
+}
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.filter-container select {
+  padding: 5px;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.driver-stats {
+  background: #f8f8f8;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.result-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 400px;
+  margin: auto;
+}
+
+.result-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+
+.result-form input,
+.result-form select {
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.result-form button {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background-color: #e10600;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: gray;
+}
+
+  
