@@ -1,6 +1,9 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Index
+from sqlalchemy import func, distinct
+from sqlalchemy.exc import SQLAlchemyError
 
 app = Flask(__name__)
 CORS(app)
@@ -56,7 +59,7 @@ class Constructors(db.Model):
 # Drivers
 #======================
 class Drivers(db.Model):
-    driverID = db.Column(db.Integer, primary_key=True)
+    driverID = db.Column(db.Integer, primary_key=True, index = True)
     firstName = db.Column(db.String(100), nullable=False)
     lastName = db.Column(db.String(100), nullable=False)
     dateOfBirth = db.Column(db.String(20))
@@ -78,9 +81,9 @@ class Drivers(db.Model):
 #======================
 class Results(db.Model):
     resultID = db.Column(db.Integer, primary_key=True)
-    driverID = db.Column(db.Integer, db.ForeignKey('drivers.driverID'), nullable=False)
-    constructorID = db.Column(db.Integer, db.ForeignKey('constructors.constructorID'), nullable=False)
-    circuitID =db.Column(db.Integer, db.ForeignKey('circuits.circuitID'), nullable=False)
+    driverID = db.Column(db.Integer, db.ForeignKey('drivers.driverID'), nullable=False, index = True)
+    constructorID = db.Column(db.Integer, db.ForeignKey('constructors.constructorID'), nullable=False, index = True)
+    circuitID =db.Column(db.Integer, db.ForeignKey('circuits.circuitID'), nullable=False, index = True)
     placement = db.Column(db.Integer) #-1 indicates DNF
     points = db.Column(db.Integer)
 
@@ -245,18 +248,37 @@ def get_results():
 @app.route('/addResult', methods=['POST'])
 def add_result():
     data = request.get_json()
-    driver_id = data.get('driverID')
-    constructor_id = data.get('constructorID')
-    circuit_id = data.get('circuitID')
-    placement = data.get('placement')
-    points = data.get('points')
-    
-    new_result = Results(driverID = driver_id, constructorID = constructor_id, circuitID =circuit_id, placement = placement, points = points)
 
-    db.session.add(new_result)
-    db.session.commit()
-    return jsonify({"message": "result added"})
+    try: 
+        #start a new transaction
+        with db.session.begin():
+            driver_id = data.get('driverID')
+            constructor_id = data.get('constructorID')
+            circuit_id = data.get('circuitID')
+            placement = data.get('placement')
+            points = data.get('points')
+            new_result = Results(driverID = driver_id, constructorID = constructor_id, circuitID =circuit_id, placement = placement, points = points)
+            db.session.add(new_result)
+        return jsonify({"message": "result added"})
+    except SQLAlchemyError as e:
+        db.session.rollback()  # roll back if something went wrong
+        return {"error": str(e)}, 500
+
+@app.route('/driverStats/<int:driver_id>', methods=['GET'])
+def driver_stats(driver_id):
+    stats = (
+        db.session.query(
+        func.round( func.avg(Results.points) , 2).label('avgPoints'),
+        func.round( func.avg( func.nullif(Results.placement, -1) ) , 2).label('avgPlacement'),
+        func.count(distinct(Results.constructorID)).label('teamCount')
+    ).filter(Results.driverID == driver_id).first())
     
+    return jsonify(
+        {   "avgPoints": stats.avgPoints,
+            "avgPlacement": stats.avgPlacement,
+            "teamCount": stats.teamCount
+        }
+    )
 
 
 if __name__ == '__main__':

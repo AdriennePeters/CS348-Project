@@ -6,12 +6,14 @@ import { useNavigate } from "react-router-dom";
 
 function Results() { 
   const [results, setResults] = useState([]); 
+  const [driverStats, setDriverStats] = useState(null); 
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(''); 
   const [selectedDriver, setSelectedDriver] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => { 
+    const fetchResults = () => {
     fetch('http://127.0.0.1:5000/results')
       .then(response => { 
         if (!response.ok) throw new Error('Failed to fetch results'); 
@@ -25,25 +27,46 @@ function Results() {
         setError(err.message); 
         setLoading(false); 
       });
-  }, []); 
+    }
+
+    fetchResults();
+
+    // Set up interval to fetch every 5 seconds
+    const interval = setInterval(fetchResults, 5000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+    }, []); 
 
   // Filter results based on the selected driver
   const filteredResults = selectedDriver
     ? results.filter(r => `${r.firstName} ${r.lastName}` === selectedDriver)
     : results;
 
-  // Compute statistics for the selected driver
-  let driverStats = null;
-  if (selectedDriver && filteredResults.length > 0) {
-    const validPlacements = filteredResults.filter(r => r.placement !== -1);
-    const avgPoints = (filteredResults.reduce((sum, r) => sum + r.points, 0) / filteredResults.length).toFixed(2);
-    const avgPlacement = validPlacements.length > 0 
-      ? (validPlacements.reduce((sum, r) => sum + r.placement, 0) / validPlacements.length).toFixed(2)
-      : "N/A";
-    const teamCount = new Set(filteredResults.map(r => r.teamName)).size;
+  // Fetch driver statistics whenever a driver is selected
+  useEffect(() => {
+    if (selectedDriver) {
+      // Find the driver's ID from results
+      const driver = results.find(r => `${r.firstName} ${r.lastName}` === selectedDriver);
+      if (!driver) {
+        setDriverStats(null);
+        return;
+      }
 
-    driverStats = { avgPoints, avgPlacement, teamCount };
-  }
+      fetch(`http://127.0.0.1:5000/driverStats/${driver.driverID}`)
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to fetch driver statistics");
+          return res.json();
+        })
+        .then(stats => setDriverStats(stats))
+        .catch(err => {
+          setError(err.message);
+          setDriverStats(null);
+        });
+    } else {
+      setDriverStats(null);
+    }
+  }, [selectedDriver, results]);
 
   const handleAdd = () => navigate("/add-result");
 
