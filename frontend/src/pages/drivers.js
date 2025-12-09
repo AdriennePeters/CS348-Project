@@ -45,20 +45,30 @@ function Drivers() {
     const [loading, setLoading] = useState(true); 
     const [error, setError] = useState(''); 
     const [selectedDriver, setSelectedDriver] = useState("");
+
     useEffect(() => { 
-        fetch('http://127.0.0.1:5000/drivers')
-        .then(response => { 
-            if (!response.ok) throw new Error('Failed to fetch drivers'); 
-            return response.json(); 
-        })
-        .then(data => { 
-            setDrivers(data); 
-            setLoading(false); 
-        }) 
-        .catch(err => { 
-            setError(err.message); 
-            setLoading(false); 
-        });
+        const fetchDrivers = () => {
+            fetch('http://127.0.0.1:5000/drivers')
+            .then(response => { 
+                if (!response.ok) throw new Error('Failed to fetch drivers'); 
+                return response.json(); 
+            })
+            .then(data => { 
+                setDrivers(data); 
+                setLoading(false); 
+            }) 
+            .catch(err => { 
+                setError(err.message); 
+                setLoading(false); 
+            });
+        }
+        fetchDrivers();
+
+        // Set up interval to fetch every 5 seconds
+        const interval = setInterval(fetchDrivers, 5000);
+
+        // Cleanup interval on unmount
+        return () => clearInterval(interval);
      }, []); 
 
      // Filter results based on the selected driver
